@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Image Tagging</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/tagging.css')}}">
+</head>
+
+<body bgcolor="black">
+    <div id="cache_process_container" style="color: white; font-size:15;"></div>
+    <div id="tagging_container" style="display: none;">
+        <div id="playback_holder"></div>
+        <div id='progress_bar'>
+            <div id='current_frame_bar'></div>
+        </div>
+        <div id="tags_container">
+            {% for index,tag in tags %}
+            <button name="tag_btn" value="{{tag}}" onclick="tag_clicked(this)" class="tag_button_class"> {{ index }} - {{ tag }}</button>
+            {% endfor %}
+        </div>
+        <div id="playback_controls" class="playback_controls_class">
+            <button id="btn_rewind" class="playback_control_button" onclick="onRewind()">Rewind</button>
+            <button id="btn_play" class="playback_control_button" onclick="onPlay()">Play</button>
+            <button id="btn_forward" class="playback_control_button" onclick="onForware()">Forward</button>
+            <button id="btn_increase_speed" class="playback_control_button" onclick="onIncreaseSpeed()">Speed Up</button>
+            <button id="btn_decrease_speed" class="playback_control_button" onclick="onDecreaseSpeed()">Speed Down</button>
+            <button id="txt_speed">Playback Speed: 1</button>
+        </div>
+        <div style="top: 24px; position: relative;">
+            <input type="text" id='tag_input' value="">
+            <button id="btn_add_tag" onclick="addTag()" class="playback_control_button">Add Tag</button>
+        </div>
+        <form name="submit" action="/save" method="post" onsubmit="onSubmit()">
+            <input type="hidden" value="" name="tags">
+            <input type="submit" value="Submit Work" class="submit_btn_class">
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/tag_manager.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/playback_manager.js') }}"></script>
+    <script>
+
+    var colors = ['#00FFFF', '#FF00FF', '#FFA500',
+        '#00FF00', '#800000', '#000080', '#808000', '#800080',
+        'teal', 'yellow'
+    ];
+
+    var imagesCount = {{ images_count | int }}
+    var tags = new Array()
+    {% for index, tag in tags %}
+    tags.push("{{tag|string}}")
+    {% endfor %}
+
+    var images_url = "{{ url_for('images',image='') }}"
+
+    var decompose_fps = {{decompose_fps | int }}
+
+    var images = {{images | tojson}}
+
+    playbackStatusListener = new PlaybackStatusChangeListener()
+    playbackManager = new PlaybackManager(playbackStatusListener, imagesCount, images, decompose_fps, images_url);
+    tagManager = new TagManager(tags, imagesCount);
+
+    progress_bar = document.getElementById('progress_bar')
+    for (var i = imagesCount - 1; i >= 0; i--) {
+        bar = document.createElement('div');
+        bar.id = i.toString();
+        bar.value = i
+        bar.className = 'bar_class'
+        bar.style.left = (100 * i / imagesCount).toString() + '%'
+        bar.style.width = (100 / imagesCount).toString() + '%'
+        bar.style.background = "#ddd"
+        bar.onclick = function() {
+            onbarclick(this);
+        }
+        progress_bar.appendChild(bar)
+    }
+
+    tagsButtons = document.getElementsByName('tag_btn')
+    for (var i = tagsButtons.length - 1; i >= 0; i--) {
+        tagsButtons[i].style.background = ColorLuminance(colors[i], -0.6)
+    }
+   
+    document.addEventListener("keydown", keyDownTextField, false);
+
+    playbackManager.cacheImages()
+
+    
+    function PlaybackStatusChangeListener() {
+
+    }
+
+
+    PlaybackStatusChangeListener.prototype.onFrame = function(index, playback_running) {
+        if (playback_running) {
+            selectedTagIndex = tagManager.tagImageAtIndex(index)
+        } else {
+            selectedTagIndex = tagManager.getTagIndexForImageAt(index)
+        }
+        var color = selectedTagIndex == null ? 'grey' : colors[selectedTagIndex]
+        updateProgress(index, color, imagesCount)
+    }
+
+    PlaybackStatusChangeListener.prototype.onDone = function() {
+        document.getElementById('btn_play').innerHTML = 'Play'
+    }
+
+    PlaybackStatusChangeListener.prototype.onCacheUpdate = function(index, total) {
+        if (index == total - 1) {
+            playbackManager.initialImageLoad()
+            tagging_container = document.getElementById("tagging_container")
+            tagging_container.style.display = 'block'
+            caching_control = document.getElementById("cache_process_container")
+            caching_control.style.display = 'none'
+        } else {
+            caching_control = document.getElementById("cache_process_container")
+            caching_control.innerHTML = "Caching progress:" + index + " out of " + total
+        }
+    }
+
+
+    function keyDownTextField(e) {
+        var keyCode = e.keyCode;
+        if (keyCode >= 49 && keyCode <= 57) {
+            index = keyCode - 49
+            tagsButtons = document.getElementsByName('tag_btn')
+            if (index < tagsButtons.length) {
+                tagsButtons[index].click()
+            }
+
+        }
+
+        switch (keyCode) {
+            case 37:
+                document.getElementById('btn_rewind').click()
+                break;
+            case 39:
+                document.getElementById('btn_forward').click()
+                break;
+            case 32:
+                e.preventDefault();
+                document.getElementById('btn_play').click()
+                break;
+            case 190:
+                document.getElementById('btn_increase_speed').click()
+                break;
+            case 188:
+                document.getElementById('btn_decrease_speed').click()
+                break;
+            default:
+                // statements_def
+                break;
+        }
+        return false;
+    }
+
+    function updateProgress(index, color, imagesCount) {
+        progress_bar = document.getElementById('progress_bar')
+        bar = document.getElementById(index.toString())
+        bar.id = index.toString()
+        bar.className = 'bar_class'
+        bar.style.left = (100 * index / imagesCount).toString() + '%'
+        bar.style.width = (100 / imagesCount).toString() + '%'
+        bar.style.background = color
+        progress_bar.appendChild(bar)
+
+        current_frame_bar = document.getElementById('current_frame_bar')
+        current_frame_bar.style.left = (100 * (index + 1) / imagesCount).toString() + '%'
+
+    }
+
+    function onbarclick(bar) {
+        index = bar.value;
+        playbackManager.gotoFrame(index);
+    }
+
+
+
+    function onRewind() {
+        playbackManager.rewind()
+    }
+
+    function onForware() {
+        playbackManager.forward()
+    }
+
+    function onPlay() {
+        running = playbackManager.play()
+        if (running) {
+            document.getElementById('btn_play').innerHTML = 'Pause'
+        } else {
+            document.getElementById('btn_play').innerHTML = 'Play'
+        }
+    }
+
+    function onIncreaseSpeed() {
+        speed = playbackManager.increaseSpeed()
+        document.getElementById('txt_speed').innerHTML = "Playback Speed: " + speed
+    }
+
+    function onDecreaseSpeed() {
+        speed = playbackManager.decreaseSpeed()
+        document.getElementById('txt_speed').innerHTML = "Playback Speed: " + speed
+    }
+
+    function addTag(){
+        tag = document.getElementById('tag_input').value
+        if (tag && !tagManager.containsTag(tag)) {
+            tagManager.addTag(tag)
+            tags_container = document.getElementById("tags_container")
+            button =  document.createElement('button')
+            button.name = "tag_btn"
+            button.value = tag
+            button.onclick = function(){
+                tag_clicked(this)
+            }
+            button.className = "tag_button_class"
+            button.innerHTML = tagManager.tags.length-1 + " - " + tag
+            button.style.background = ColorLuminance(colors[tagManager.tags.length-1])
+            tags_container.appendChild(button)
+        }
+        document.getElementById('tag_input').value = "";
+    }
+
+
+    function tag_clicked(button) {
+        tag = button.value
+        tagManager.setSelected(tag)
+        tagsButtons = document.getElementsByName('tag_btn')
+        for (var i = tagsButtons.length - 1; i >= 0; i--) {
+            if (tagManager.getSelected() == i) {
+                tagsButtons[i].style.background = colors[i]
+            } else {
+                tagsButtons[i].style.background = ColorLuminance(colors[i], -0.6)
+            }
+        }
+        selectedTagIndex = tagManager.tagImageAtIndex(playbackManager.getCurrentFrame())
+        var color = selectedTagIndex == null ? 'grey' : colors[selectedTagIndex]
+        updateProgress(playbackManager.getCurrentFrame(), color, imagesCount)
+    }
+
+    function ColorLuminance(hex, lum) {
+        hex = String(hex).replace(/[^0-9a-f]/gi, '');
+        if (hex.length < 6) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        lum = lum || 0;
+        var rgb = "#",
+            c, i;
+        for (i = 0; i < 3; i++) {
+            c = parseInt(hex.substr(i * 2, 2), 16);
+            c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+            rgb += ("00" + c).substr(c.length);
+        }
+
+        return rgb;
+    }
+
+    function onSubmit() {
+        document.submit.tags.value = tagManager.getTagsForUmages();
+        return true;
+    }
+    </script>
+</body>
+
+</html>

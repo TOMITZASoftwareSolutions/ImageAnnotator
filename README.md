@@ -1,5 +1,5 @@
 ## Deploying
-Open terminal in folder where Dockerfile is:
+    Open terminal in folder where Dockerfile is:
     1. Create a folder where you place your video/images and a labels.txt file where you place tags in a single line separated by space
     2. Build docker image:
         docker build -t image_annotator .

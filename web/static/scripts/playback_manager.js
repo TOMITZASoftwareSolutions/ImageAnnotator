@@ -125,7 +125,7 @@ PlaybackManager.prototype.forward = function() {
     forward_frames_count = this.fps * 3
     this.currentFrame = Math.min(this.currentFrame += forward_frames_count, this.totalFrames - 1)
     this.running = false
-    if (this.statusChangedListener != nul) {
+    if (this.statusChangedListener != null) {
         this.statusChangedListener.onDone()
     }
     this.nextFrame = null

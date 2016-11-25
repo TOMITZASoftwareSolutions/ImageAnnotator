@@ -21,8 +21,10 @@
  };
 
  TagManager.prototype.tagImageAtIndex = function(index) {
-     if (this.selected != null) {
+     if (this.selected) {
          this.tagsForImages[index] = this.tags[this.selected]
+     }else{
+        this.tagsForImages[index] = 'non-class'
      }
      return this.selected
  }

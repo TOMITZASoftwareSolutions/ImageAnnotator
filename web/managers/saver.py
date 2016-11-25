@@ -14,13 +14,12 @@ class TagSaverManager:
             os.mkdir(dataset_path)
 
         for tag, image in zip(tags, images):
-            if tag == '':
-                tag = 'non-class'
-            path = os.path.join(dataset_path, tag)
-            if not os.path.exists(path):
-                os.mkdir(path)
+            if tag != '':
+                path = os.path.join(dataset_path, tag)
+                if not os.path.exists(path):
+                    os.mkdir(path)
 
-            copy2(os.path.join(images_folder, image), os.path.join(path, image))
+                copy2(os.path.join(images_folder, image), os.path.join(path, image))
 
 
 if __name__ == '__main__':

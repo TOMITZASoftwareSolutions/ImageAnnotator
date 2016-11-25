@@ -41,7 +41,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='scripts/playback_manager.js') }}"></script>
     <script>
 
-    var colors = ['#00FFFF', '#FF00FF', '#FFA500',
+   var colors = ['#00FFFF', '#FF00FF', '#FFA500',
         '#00FF00', '#800000', '#000080', '#808000', '#800080',
         'teal', 'yellow'
     ];
@@ -57,7 +57,7 @@
     var decompose_fps = {{decompose_fps | int }}
 
     var images = {{images | tojson}}
-
+    
     playbackStatusListener = new PlaybackStatusChangeListener()
     playbackManager = new PlaybackManager(playbackStatusListener, imagesCount, images, decompose_fps, images_url);
     tagManager = new TagManager(tags, imagesCount);
@@ -81,12 +81,12 @@
     for (var i = tagsButtons.length - 1; i >= 0; i--) {
         tagsButtons[i].style.background = ColorLuminance(colors[i], -0.6)
     }
-   
+
     document.addEventListener("keydown", keyDownTextField, false);
 
     playbackManager.cacheImages()
 
-    
+
     function PlaybackStatusChangeListener() {
 
     }
@@ -204,20 +204,20 @@
         document.getElementById('txt_speed').innerHTML = "Playback Speed: " + speed
     }
 
-    function addTag(){
+    function addTag() {
         tag = document.getElementById('tag_input').value
         if (tag && !tagManager.containsTag(tag)) {
             tagManager.addTag(tag)
             tags_container = document.getElementById("tags_container")
-            button =  document.createElement('button')
+            button = document.createElement('button')
             button.name = "tag_btn"
             button.value = tag
-            button.onclick = function(){
+            button.onclick = function() {
                 tag_clicked(this)
             }
             button.className = "tag_button_class"
-            button.innerHTML = tagManager.tags.length-1 + " - " + tag
-            button.style.background = ColorLuminance(colors[tagManager.tags.length-1])
+            button.innerHTML = tagManager.tags.length - 1 + " - " + tag
+            button.style.background = ColorLuminance(colors[tagManager.tags.length - 1])
             tags_container.appendChild(button)
         }
         document.getElementById('tag_input').value = "";

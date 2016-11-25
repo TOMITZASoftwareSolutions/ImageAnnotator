@@ -216,7 +216,7 @@
                 tag_clicked(this)
             }
             button.className = "tag_button_class"
-            button.innerHTML = tagManager.tags.length - 1 + " - " + tag
+            button.innerHTML = tagManager.tags.length  + " - " + tag
             button.style.background = ColorLuminance(colors[tagManager.tags.length - 1])
             tags_container.appendChild(button)
         }

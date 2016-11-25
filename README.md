@@ -22,4 +22,4 @@
     Tags: 1,2,3...
     
 ## Example of run command:
-    docker run -p 80:9191 -it -v /$PWD/:/data image_annotator python app.py --video_path /data/"CrossChek Inspection - Wet Clay.mp4" --decompose_fps 2
+    docker run -p 80:9191 -it -v /$PWD/:/data image_annotator python app.py --video_path /data/"CrossChek Inspection - Wet Clay.mp4" --decompose_fps 10

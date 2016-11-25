@@ -49,11 +49,10 @@ PlaybackManager.prototype.initialImageLoad = function() {
     }
 }
 
-PlaybackManager.prototype.cacheImages = function(){
+PlaybackManager.prototype.cacheImages = function() {
     image_source = this.source + this.images[this.currentFrame]
 
-    if ($("#preloadpit").size() == 0)
-    {
+    if ($("#preloadpit").size() == 0) {
         $("<div id='preloadpit'></div>").appendTo("body").hide();
     }
 
@@ -64,9 +63,9 @@ PlaybackManager.prototype.cacheImages = function(){
         $("<img src='" + image_source + "'>").appendTo("#preloadpit");
 
 
-        self.statusChangedListener.onCacheUpdate(self.currentFrame,self.totalFrames)
+        self.statusChangedListener.onCacheUpdate(self.currentFrame, self.totalFrames)
         self.currentFrame = (self.currentFrame + 1) % self.totalFrames
-        if (self.currentFrame != 0){
+        if (self.currentFrame != 0) {
             self.cacheImages()
         }
     }
@@ -126,7 +125,7 @@ PlaybackManager.prototype.forward = function() {
     forward_frames_count = this.fps * 3
     this.currentFrame = Math.min(this.currentFrame += forward_frames_count, this.totalFrames - 1)
     this.running = false
-    if (this.statusChangedListener) {
+    if (this.statusChangedListener != nul) {
         this.statusChangedListener.onDone()
     }
     this.nextFrame = null
@@ -147,7 +146,7 @@ PlaybackManager.prototype.rewind = function() {
 PlaybackManager.prototype.gotoFrame = function(index) {
     this.currentFrame = index;
     this.running = false;
-    if (this.statusChangedListener) {
+    if (this.statusChangedListener != null) {
         this.statusChangedListener.onDone()
     }
     this.nextFrame = null

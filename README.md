@@ -5,7 +5,8 @@
         docker build -t image_annotator .
     3. Start docker container:
         docker run -p 80:9191 -it -v  <local_data_folder>:/ image_annotator python app.py --video_path /<video_name> --decompose_fps 2
-    4. Open localhost:80 in Chrome Browser 
+    4. Open localhost:80 in Chrome Browser
+    5. See progress in terminal for video decomposition
     
 ## Commandline Arguments 
     <local_data_folder> - The folder on your local machine where the video is - the folder is mounted in root on docker so when specifying video name you should use /

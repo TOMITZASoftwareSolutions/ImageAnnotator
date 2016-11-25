@@ -21,10 +21,10 @@
  };
 
  TagManager.prototype.tagImageAtIndex = function(index) {
-     if (this.selected) {
+     if (this.selected != null) {
          this.tagsForImages[index] = this.tags[this.selected]
-     }else{
-        this.tagsForImages[index] = 'non-class'
+     } else {
+         this.tagsForImages[index] = 'non-class'
      }
      return this.selected
  }
@@ -33,18 +33,20 @@
      return this.tagsForImages
  }
 
- TagManager.prototype.getTagIndexForImageAt = function(imageIndex){
-    tagIndex = this.tags.map(function(e) { return e; }).indexOf(this.tagsForImages[imageIndex]);
-    if (tagIndex==-1) {
-        tagIndex = null
-    }
-    return tagIndex
+ TagManager.prototype.getTagIndexForImageAt = function(imageIndex) {
+     tagIndex = this.tags.map(function(e) {
+         return e;
+     }).indexOf(this.tagsForImages[imageIndex]);
+     if (tagIndex == -1) {
+         tagIndex = null
+     }
+     return tagIndex
  }
 
- TagManager.prototype.addTag = function(tagName){
-    this.tags.push(tagName)
+ TagManager.prototype.addTag = function(tagName) {
+     this.tags.push(tagName)
  }
 
- TagManager.prototype.containsTag = function(tagName){
-    return this.tags.indexOf(tagName) != -1;
+ TagManager.prototype.containsTag = function(tagName) {
+     return this.tags.indexOf(tagName) != -1;
  }

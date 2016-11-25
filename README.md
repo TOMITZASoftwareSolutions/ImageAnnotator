@@ -11,7 +11,7 @@
 ## Commandline Arguments 
     <local_data_folder> - The folder on your local machine where the video is - the folder is mounted in root on docker so when specifying video name you should use /
     --video_path /<video_name> the name of your video
-    --decompose_fps - sampling rate from the original video (based on this and the video size the loading time will vary)
+    --decompose_fps - sampling rate from the original video (based on this and the video size the loading time will vary) (10 fps Recommended for good compromise between speed and quality)
 
 ## Shortcut Controls
     Play: Space key
